@@ -81,7 +81,7 @@ USE_MOCK_DATA=true
 - **가격 예측**: `amazon/chronos-t5-base` (HuggingFace)
   - Zero-shot time-series forecasting
   - GPU 가속 지원 (CUDA)
-- **자연어 설명**: `gemini-2.0-flash` (Google AI)
+- **자연어 설명**: `gemini-2.5-flash` (Google AI)
   - 예측 결과를 한국어로 설명
 
 ## 📊 데이터 소스 (로컬 데이터 기반)
