@@ -13,14 +13,15 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string>("");
   const [historyDays, setHistoryDays] = useState(90);
+  const [grade, setGrade] = useState("상");
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       const [todayData, predData] = await Promise.all([
-        getTodayPrice(),
-        getPrediction(historyDays),
+        getTodayPrice(undefined, "1101", grade),
+        getPrediction(historyDays, grade),
       ]);
       setToday(todayData);
       setPrediction(predData);
@@ -35,7 +36,7 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  }, [historyDays]);
+  }, [historyDays, grade]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -69,6 +70,16 @@ export default function DashboardPage() {
               )}
               <div className="flex gap-2 items-center">
                 <select
+                  value={grade}
+                  onChange={(e) => setGrade(e.target.value)}
+                  className="text-xs rounded-lg border border-white/10 bg-white/5 text-slate-300 px-3 py-1.5 focus:outline-none focus:border-emerald-500/50"
+                >
+                  <option value="특">특 등급</option>
+                  <option value="상">상 등급</option>
+                  <option value="중">중 등급</option>
+                  <option value="하">하 등급</option>
+                </select>
+                <select
                   value={historyDays}
                   onChange={(e) => setHistoryDays(Number(e.target.value))}
                   className="text-xs rounded-lg border border-white/10 bg-white/5 text-slate-300 px-3 py-1.5 focus:outline-none focus:border-emerald-500/50"
@@ -99,10 +110,9 @@ export default function DashboardPage() {
           {/* 데이터 소스 배지 */}
           <div className="flex gap-2 mt-4 flex-wrap">
             {[
-              { label: "KAMIS API", color: "bg-emerald-500/10 border-emerald-500/30 text-emerald-400" },
-              { label: "Chronos-T5-small", color: "bg-purple-500/10 border-purple-500/30 text-purple-400" },
-              { label: "Gemini 2.0 Flash", color: "bg-blue-500/10 border-blue-500/30 text-blue-400" },
-              { label: today?.source === "mock" ? "📋 Mock 데이터" : "✅ 실시간 데이터", color: "bg-amber-500/10 border-amber-500/30 text-amber-400" },
+              { label: "로컬 데이터", color: "bg-emerald-500/10 border-emerald-500/30 text-emerald-400" },
+              { label: "Chronos-T5-base", color: "bg-purple-500/10 border-purple-500/30 text-purple-400" },
+              { label: "Gemini 2.5 Flash", color: "bg-blue-500/10 border-blue-500/30 text-blue-400" },
             ].map((b) => (
               <span key={b.label} className={`text-xs px-3 py-1 rounded-full border ${b.color}`}>{b.label}</span>
             ))}
@@ -132,9 +142,9 @@ export default function DashboardPage() {
             {/* 통계 카드 */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 animate-fadeIn">
               <StatCard
-                label="현재 도매가"
+                label={`${grade} 등급 현재 도매가`}
                 value={`${prediction.summary.current_price.toLocaleString()}원`}
-                sub="20kg 기준 · 서울"
+                sub="10kg 기준 · 전국 주산지 평균"
                 badge="오늘"
                 badgeColor="bg-slate-500/20 text-slate-400"
               />
@@ -165,10 +175,10 @@ export default function DashboardPage() {
             <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-6 mb-6 animate-fadeIn" style={{ animationDelay: "0.1s" }}>
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-lg font-semibold text-white">🥬 배추 도매가격 추이 및 예측</h2>
+                  <h2 className="text-lg font-semibold text-white">🥬 {grade} 등급 배추 가격 추이 및 예측</h2>
                   <p className="text-xs text-slate-500 mt-1">실선: 실제 가격 | 점선: Chronos 예측 | 음영: 90% 신뢰구간</p>
                 </div>
-                <span className="text-xs text-slate-500">단위: 원/20kg</span>
+                <span className="text-xs text-slate-500">단위: 원/10kg</span>
               </div>
               <PriceChart
                 history={prediction.history}
@@ -227,7 +237,7 @@ export default function DashboardPage() {
 
         {/* 푸터 */}
         <footer className="mt-10 text-center text-xs text-slate-600">
-          <p>데이터 출처: KAMIS (한국농수산식품유통공사) · AI 모델: Chronos-T5-small, Gemini 2.0 Flash</p>
+          <p>데이터: 로컬 데이터(기상, 유가 복합참조) · AI: Chronos-T5-base, Gemini 2.5 Flash</p>
           <p className="mt-1">⚠️ 예측 결과는 참고용이며 실제 가격과 다를 수 있습니다.</p>
         </footer>
       </div>

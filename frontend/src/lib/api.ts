@@ -6,14 +6,16 @@ const api = axios.create({
   timeout: 120000, // Chronos 모델 로딩 시간 고려
 });
 
-export async function getTodayPrice(): Promise<TodayPrice> {
-  const { data } = await api.get("/api/price/today");
+export async function getTodayPrice(date?: string, market: string = "1101", grade: string = "상"): Promise<TodayPrice> {
+  const { data } = await api.get("/api/price/today", {
+    params: { date, market, grade },
+  });
   return data;
 }
 
-export async function getPrediction(historyDays = 90): Promise<PredictionResponse> {
+export async function getPrediction(historyDays = 90, grade: string = "상"): Promise<PredictionResponse> {
   const { data } = await api.get("/api/predict", {
-    params: { history_days: historyDays },
+    params: { history_days: historyDays, grade },
   });
   return data;
 }

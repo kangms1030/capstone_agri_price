@@ -1,6 +1,6 @@
 """
 Chronos 기반 배추 가격 예측 서비스
-amazon/chronos-t5-small 모델로 T+14일 예측
+amazon/chronos-t5-base 모델로 T+14일 예측
 """
 
 import logging
@@ -24,7 +24,7 @@ def get_pipeline():
             device = "cuda" if torch.cuda.is_available() else "cpu"
             logger.info(f"Chronos 모델 로딩 중... (device={device})")
             _pipeline = BaseChronosPipeline.from_pretrained(
-                "amazon/chronos-t5-small",
+                "amazon/chronos-t5-base",
                 device_map=device,
                 torch_dtype=torch.bfloat16,
             )
@@ -77,15 +77,16 @@ class CabbagePricePredictor:
 
             # 예측 실행 (quantile 포함)
             quantiles, mean = pipeline.predict_quantiles(
-                context=context,
+                context,
                 prediction_length=self.forecast_horizon,
                 quantile_levels=[0.1, 0.5, 0.9],
                 num_samples=100,
             )
-            # quantiles shape: (batch=1, quantile_levels, horizon)
-            q10 = quantiles[0, 0].numpy()
-            q50 = quantiles[0, 1].numpy()
-            q90 = quantiles[0, 2].numpy()
+            # quantiles shape: (batch=1, horizon, quantile_levels)
+            quantiles = quantiles[0].numpy() # shape: (horizon, 3)
+            q10 = quantiles[:, 0]
+            q50 = quantiles[:, 1]
+            q90 = quantiles[:, 2]
 
             predictions = []
             for i in range(self.forecast_horizon):
