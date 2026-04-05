@@ -19,7 +19,7 @@ DATA_DIR = os.path.join(BASE_DIR, "data")
 CABBAGE_EXCEL = os.path.join(DATA_DIR, "agri_price", "cabbage.xlsx")
 WEATHER_CSV = os.path.join(DATA_DIR, "weather_data_2015_2025.csv")
 # Find oil csv dynamically
-_oil_candidates = glob.glob(os.path.join(DATA_DIR, "*원유*.csv"))
+_oil_candidates = glob.glob(os.path.join(DATA_DIR, "*면세유*.csv"))
 OIL_CSV = _oil_candidates[0] if _oil_candidates else ""
 
 class LocalDataClient:

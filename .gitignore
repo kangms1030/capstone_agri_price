@@ -27,6 +27,7 @@ build/
 Thumbs.db
 
 # IDEs
+.cursorrules
 .vscode/
 .idea/
 

@@ -15,7 +15,6 @@ load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 from .api.price import router as price_router
 from .api.predict import router as predict_router
-from .services.predictor import get_pipeline
 
 logging.basicConfig(
     level=logging.INFO,
@@ -26,11 +25,13 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """서버 시작 시 Chronos 모델 사전 로드"""
+    """
+    Uvicorn은 lifespan 실행 후에 소켓을 bind합니다.
+    Chronos를 여기서 미리 올리면 포트 충돌(10048) 시에도 GPU·메모리만 쓰고 죽을 수 있어,
+    모델은 /api/predict 첫 요청 시 get_pipeline()에서 지연 로드합니다.
+    """
     logger.info("=== Agri-Insight 백엔드 시작 ===")
-    logger.info("Chronos 모델 사전 로딩 중...")
-    get_pipeline()  # 모델 미리 로드
-    logger.info("서버 준비 완료!")
+    logger.info("Chronos는 첫 예측 요청 시 로드됩니다.")
     yield
     logger.info("서버 종료")
 
