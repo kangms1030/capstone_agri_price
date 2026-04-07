@@ -39,6 +39,7 @@ tmp/
 
 # Model and Outputs
 chronos_lora_output/
+chronos_full_ft_output/
 
 # Data
 data/
