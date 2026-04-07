@@ -1,0 +1,15 @@
+import pandas as pd
+
+df = pd.read_csv('data/final_dataset/chronos2_final_dataset.csv')
+print("Columns:", df.columns.tolist())
+print("-" * 50)
+print("First 10 rows:")
+print(df.head(10))
+print("-" * 50)
+print("Summary Statistics (Target):")
+print(df['target'].describe())
+print("-" * 50)
+print("Unique Item IDs:", df['item_id'].nunique())
+print("-" * 50)
+print("Check for NaNs (should be 0 after fillna):")
+print(df.isna().sum().sum())

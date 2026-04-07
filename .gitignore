@@ -36,3 +36,9 @@ Thumbs.db
 
 # Temporary files
 tmp/
+
+# Model and Outputs
+chronos_lora_output/
+
+# Data
+data/
